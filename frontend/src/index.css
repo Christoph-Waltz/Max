@@ -1,0 +1,63 @@
+/* ─── Import fonts ───────────────────────────────────────────────────────── */
+@font-face {
+  font-family: 'Adamina';
+  src: url('./assets/fonts/Adamina.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  src: url('./assets/fonts/Bricolage Grotesque.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Royale';
+  src: url('../assets/fonts/Royale Semibold.TTF') format('truetype');
+}
+
+/* ─── Tokens ─────────────────────────────────────────────────────────────── */
+:root {
+  --bg: #0d0d0d;
+  --surface: #141414;
+  --surface-hov: #181818;
+  --border: #272727;
+  --border-hov: #383838;
+  --accent: #b0b0b0;
+  --text-pri: #d0d0d0;
+  --text-sec: #b0b0b0;
+  --text-dim: #787878;
+  --text-sage: #9dc9a0;
+  --text-rose: #c97a7a;
+  --footer-bg: #0a0a0a;
+
+  --font-heading: 'Adamina', Georgia, serif;
+  --font-body: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-fancy: 'Royale', Georgia, serif;
+}
+
+/* ─── Reset ──────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text-pri);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+input[type=search]::-webkit-search-cancel-button {
+  display: none;
+}
+
+input::placeholder {
+  color: var(--text-dim);
+}

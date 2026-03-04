@@ -1,0 +1,916 @@
+/* ═══════════════════════════════════════════════════════════════
+   EDIT MODEL MODAL
+   Composes from AddModelModal patterns — same tokens, same BEM.
+   Additional rules: changed indicators, diff table, new badge.
+═══════════════════════════════════════════════════════════════ */
+
+/* ─── Overlay ─────────────────────────────────────────────────────────────── */
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 8000;
+    background: transparent;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    transition: background 0.25s ease, backdrop-filter 0.25s ease;
+    pointer-events: none;
+
+    &--vis {
+        background: #00000080;
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
+        pointer-events: auto;
+    }
+}
+
+/* ─── Shell ───────────────────────────────────────────────────────────────── */
+.shell {
+    width: min(780px, 100%);
+    max-height: calc(100vh - 48px);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+    transition:
+        opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &--vis {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ─── Header ──────────────────────────────────────────────────────────────── */
+.header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 28px 32px 0;
+    flex-shrink: 0;
+
+
+    &__title {
+        font-family: var(--font-heading);
+        font-size: 32px;
+        font-weight: 400;
+        color: var(--text-pri);
+        letter-spacing: -0.5px;
+        line-height: 1;
+    }
+
+    &__close {
+        width: 32px;
+        height: 32px;
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-dim);
+        transition: border-color 0.15s, color 0.15s, background 0.15s;
+        flex-shrink: 0;
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        &:hover {
+            color: var(--text-rose);
+            border-color: var(--text-rose);
+            background: rgba(201, 160, 160, 0.1);
+        }
+    }
+}
+
+/* ─── Step bar ────────────────────────────────────────────────────────────── */
+.step-bar {
+    display: flex;
+    align-items: center;
+    padding: 24px 32px 0;
+    flex-shrink: 0;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        opacity: 0.3;
+        transition: opacity 0.25s;
+
+        &--active {
+            opacity: 1;
+        }
+
+        &--done {
+            opacity: 0.65;
+        }
+
+        &--done &__dot,
+        &--active &__dot {
+            background: rgba(157, 201, 160, 0.12);
+            border-color: var(--text-sage);
+            color: var(--text-sage);
+        }
+    }
+
+    &__dot {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-body);
+        font-size: 10px;
+        color: var(--text-dim);
+        flex-shrink: 0;
+
+        svg {
+            width: 10px;
+            height: 10px;
+        }
+    }
+
+    &__name {
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-sec);
+        white-space: nowrap;
+    }
+
+    &__item--active &__name {
+        color: var(--text-pri);
+    }
+
+    &__line {
+        flex: 1;
+        height: 1px;
+        background: var(--border);
+        margin: 0 12px;
+        min-width: 24px;
+    }
+}
+
+/* ─── Body ────────────────────────────────────────────────────────────────── */
+.body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 32px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    min-height: 0;
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 2px;
+    }
+}
+
+/* ─── Field ───────────────────────────────────────────────────────────────── */
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__label {
+        font-family: var(--font-body);
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+    }
+
+    &__input {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 12px 16px;
+        font-family: var(--font-body);
+        font-size: 14px;
+        font-weight: 300;
+        color: var(--text-pri);
+        outline: none;
+        transition: border-color 0.15s;
+        width: 100%;
+
+        &::placeholder {
+            color: var(--text-dim);
+        }
+
+        &:focus {
+            border-color: rgba(157, 201, 160, 0.45);
+            box-shadow: 0 0 0 3px rgba(157, 201, 160, 0.06);
+        }
+    }
+}
+
+/* ─── Step 0 — Identity ───────────────────────────────────────────────────── */
+.step-identity {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.pill-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.pill-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    &__label {
+        font-family: var(--font-body);
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        width: 52px;
+        flex-shrink: 0;
+    }
+
+    &__options {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    &__opt {
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 0.5px;
+        text-transform: capitalize;
+        color: var(--text-dim);
+        background: transparent;
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 5px 14px;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s, background 0.15s;
+
+        &:hover {
+            color: var(--text-sec);
+            border-color: var(--border-hov);
+        }
+
+        &--on {
+            color: var(--text-sage);
+            border-color: rgba(157, 201, 160, 0.4);
+            background: rgba(157, 201, 160, 0.07);
+        }
+
+        &--changed {
+            color: var(--bg);
+            background: var(--text-sage);
+            border-color: var(--text-sage);
+        }
+    }
+}
+
+.flags {
+    display: flex;
+    gap: 32px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+
+    &__label {
+        font-family: var(--font-body);
+        font-size: 12px;
+        font-weight: 300;
+        color: var(--text-sec);
+        letter-spacing: 0.3px;
+    }
+
+    &__track {
+        position: relative;
+        width: 36px;
+        height: 18px;
+        border-radius: 9px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        transition: background 0.2s, border-color 0.2s;
+
+        &--on {
+            background: rgba(157, 201, 160, 0.18);
+            border-color: rgba(157, 201, 160, 0.4);
+
+            .toggle__knob {
+                transform: translateX(18px);
+                background: var(--text-sage);
+            }
+        }
+    }
+
+    &__knob {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--border-hov);
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s;
+    }
+}
+
+/* ─── Step 1 — Images ─────────────────────────────────────────────────────── */
+.step-images {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    &__note {
+        font-family: var(--font-body);
+        font-size: 12px;
+        font-weight: 300;
+        line-height: 1.7;
+        color: var(--text-dim);
+        padding: 12px 16px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        border-left: 2px solid rgba(201, 160, 160, 0.35);
+        /* rose tint for edit context */
+
+        code {
+            font-family: "Fira Code", "Courier New", monospace;
+            font-size: 11px;
+            color: var(--text-sage);
+            background: rgba(157, 201, 160, 0.08);
+            padding: 1px 5px;
+            border-radius: 2px;
+        }
+    }
+
+    &__grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 12px;
+        align-items: start;
+    }
+
+    &__slot {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+/* ─── Upload zone ─────────────────────────────────────────────────────────── */
+.upload-zone {
+    position: relative;
+    width: 100%;
+    background: var(--bg);
+    border: 1px dashed var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+
+    &:hover {
+        border-color: var(--border-hov);
+    }
+
+    &--drag {
+        border-color: rgba(157, 201, 160, 0.5);
+        background: rgba(157, 201, 160, 0.04);
+    }
+
+    &--filled {
+        border-style: solid;
+        border-color: var(--border);
+    }
+
+    /* Solid rose border when a new file has been selected */
+    &--changed {
+        border-style: solid;
+        border-color: rgba(157, 201, 160, 0.5);
+        box-shadow: 0 0 0 2px rgba(157, 201, 160, 0.08);
+    }
+
+    &__img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    &__overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+
+    &:hover &__overlay {
+        opacity: 1;
+    }
+
+    &__overlay-text {
+        font-family: var(--font-body);
+        font-size: 10px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.8);
+    }
+
+    /* "Changed" badge — top-right corner */
+    &__badge {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        font-family: var(--font-body);
+        font-size: 8px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--bg);
+        background: var(--text-sage);
+        border-radius: 2px;
+        padding: 2px 6px;
+        pointer-events: none;
+    }
+
+    &__empty {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px;
+    }
+
+    &__icon {
+        width: 28px;
+        height: 28px;
+        color: var(--border-hov);
+    }
+
+    &__label {
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-sec);
+        text-align: center;
+    }
+
+    &__hint {
+        font-family: var(--font-body);
+        font-size: 10px;
+        color: var(--text-dim);
+        text-align: center;
+        line-height: 1.5;
+    }
+}
+
+/* ─── Step 2 — Confirm ────────────────────────────────────────────────────── */
+.step-confirm {
+    &__card {
+        display: flex;
+        gap: 28px;
+        align-items: flex-start;
+    }
+
+    &__images {
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+        align-items: flex-start;
+    }
+
+    /* Wrapper needed for the "New" badge */
+    &__thumb-wrap {
+        position: relative;
+    }
+
+    &__thumb {
+        height: 120px;
+        width: auto;
+        object-fit: cover;
+        border-radius: 2px;
+        border: 1px solid var(--border);
+        display: block;
+        transition: border-color 0.2s;
+
+        /* Highlight newly replaced images */
+        &--changed {
+            border-color: rgba(157, 201, 160, 0.5);
+            box-shadow: 0 0 0 2px rgba(157, 201, 160, 0.1);
+        }
+    }
+
+    &__thumb-badge {
+        position: absolute;
+        bottom: 4px;
+        left: 4px;
+        font-family: var(--font-body);
+        font-size: 8px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: var(--bg);
+        background: var(--text-sage);
+        border-radius: 2px;
+        padding: 2px 5px;
+    }
+
+    &__details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        min-width: 0;
+    }
+
+    &__name {
+        font-family: var(--font-heading);
+        font-size: 34px;
+        font-weight: 400;
+        color: var(--text-pri);
+        letter-spacing: -0.5px;
+        line-height: 1;
+
+        &-old {
+            color: var(--text-dim);
+            text-decoration: line-through;
+            text-decoration-color: rgba(201, 160, 160, 0.5);
+            font-size: 0.75em;
+        }
+
+        &-arrow {
+            color: var(--text-dim);
+            font-size: 0.65em;
+        }
+    }
+
+    &__attrs {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__attr {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        padding: 7px 0;
+        border-bottom: 1px solid var(--border);
+
+        &:first-child {
+            border-top: 1px solid var(--border);
+        }
+
+        /* Highlight rows that have changed */
+        &--changed {
+            background: rgba(157, 201, 160, 0.04);
+            margin: 0 -8px;
+            padding-left: 8px;
+            padding-right: 8px;
+            border-radius: 2px;
+            border-bottom-color: transparent;
+        }
+
+        &-key {
+            font-family: var(--font-body);
+            font-size: 9px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            width: 52px;
+            flex-shrink: 0;
+        }
+
+        &-val {
+            font-family: var(--font-body);
+            font-size: 12px;
+            font-weight: 300;
+            color: var(--text-pri);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            text-transform: capitalize;
+        }
+
+        &-old {
+            color: var(--text-dim);
+            text-decoration: line-through;
+            text-decoration-color: rgba(201, 160, 160, 0.5);
+        }
+
+        &-arrow {
+            color: var(--text-dim);
+            font-size: 10px;
+        }
+
+        &-new {
+            color: var(--text-sage);
+        }
+    }
+
+    &__no-changes {
+        font-family: var(--font-body);
+        font-size: 11px;
+        font-weight: 300;
+        color: var(--text-dim);
+        font-style: italic;
+        letter-spacing: 0.3px;
+    }
+
+    /* Flag chips — matches AddModel confirm style */
+    &__flags {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    &__flag {
+        font-family: var(--font-body);
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-sage);
+        border: 1px solid rgba(157, 201, 160, 0.3);
+        border-radius: 2px;
+        padding: 3px 10px;
+        background: rgba(157, 201, 160, 0.06);
+
+        /* Newly enabled flag — slightly brighter to signal it was just turned on */
+        &--new {
+            color: var(--bg);
+            background: var(--text-sage);
+            border-color: var(--text-sage);
+        }
+    }
+
+    /* Flag that was on before but is now off — shown struck through in dim */
+    &__flag--removed {
+        font-family: var(--font-body);
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        border: 1px solid var(--border);
+        border-radius: 2px;
+        padding: 3px 10px;
+        background: transparent;
+        text-decoration: line-through;
+        text-decoration-color: rgba(201, 160, 160, 0.5);
+    }
+
+    &__flag-none {
+        font-family: var(--font-body);
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-dim);
+    }
+}
+
+/* ─── Error ───────────────────────────────────────────────────────────────── */
+.error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 32px;
+    background: rgba(122, 48, 48, 0.12);
+    border-top: 1px solid rgba(122, 48, 48, 0.25);
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 300;
+    color: #c9a0a0;
+    flex-shrink: 0;
+
+    svg {
+        width: 14px;
+        height: 14px;
+        fill: #c9a0a0;
+        flex-shrink: 0;
+    }
+}
+
+/* ─── Footer ──────────────────────────────────────────────────────────────── */
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px 24px;
+    border-top: 1px solid var(--border);
+    flex-shrink: 0;
+
+    &__back {
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 1px;
+        color: var(--text-dim);
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: color 0.15s;
+        padding: 0;
+
+        &:hover {
+            color: var(--text-sec);
+        }
+    }
+
+    &__next {
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--text-sage);
+        background: rgba(157, 201, 160, 0.08);
+        border: 1px solid rgba(157, 201, 160, 0.3);
+        border-radius: 2px;
+        padding: 10px 28px;
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s, transform 0.15s;
+
+        span {
+            opacity: 0.7;
+            margin-left: 4px;
+        }
+
+        &:hover {
+            background: rgba(157, 201, 160, 0.13);
+            border-color: rgba(157, 201, 160, 0.5);
+            transform: translateX(2px);
+        }
+    }
+
+    &__submit {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--bg);
+        background: linear-gradient(135deg, #9dc9a0, #6aaa6e);
+        border: none;
+        border-radius: 2px;
+        padding: 10px 28px;
+        cursor: pointer;
+        transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s;
+        box-shadow: 0 4px 20px rgba(157, 201, 160, 0.2);
+
+        &:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(157, 201, 160, 0.3);
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        &--loading {
+            opacity: 0.75;
+        }
+
+        &-ring {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0, 0, 0, 0.3);
+            border-top-color: rgba(0, 0, 0, 0.8);
+            animation: spin 0.9s linear infinite;
+            flex-shrink: 0;
+        }
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ─── Success ─────────────────────────────────────────────────────────────── */
+.success {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 56px 32px;
+    animation: successFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+    &__ring {
+        width: 72px;
+        height: 72px;
+        color: var(--text-sage);
+        margin-bottom: 8px;
+
+        svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+    }
+
+    &__ring-circle {
+        stroke-dasharray: 151;
+        stroke-dashoffset: 151;
+        animation: drawCircle 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+    }
+
+    &__ring-check {
+        stroke-dasharray: 30;
+        stroke-dashoffset: 30;
+        animation: drawCheck 0.35s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+    }
+
+    &__title {
+        font-family: var(--font-heading);
+        font-size: 28px;
+        font-weight: 400;
+        color: var(--text-pri);
+        letter-spacing: -0.5px;
+        animation: successSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.6s both;
+    }
+
+    &__note {
+        font-family: var(--font-body);
+        font-size: 10px;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: var(--text-sage);
+        opacity: 0.7;
+        animation: successSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.7s both;
+    }
+}
+
+@keyframes drawCircle {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes drawCheck {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes successFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes successSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,235 @@
+// ── Shared mixins ──────────────────────────────────────────────
+@mixin quick-links-base {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 70%;
+    padding: 56px 0;
+
+    &__col {
+        display: flex;
+        flex-direction: column;
+        list-style: none;
+        gap: 10px;
+    }
+
+    &__heading {
+        font-family: var(--font-body);
+        font-size: 11px;
+        letter-spacing: 2.5px;
+        text-transform: uppercase;
+        color: var(--text-sec);
+        margin-bottom: 8px;
+        list-style: none;
+    }
+
+    &__item {
+        list-style: none;
+
+        a {
+            font-family: var(--font-body);
+            font-size: 13px;
+            text-decoration: none;
+            color: var(--text-dim);
+            transition: color 0.15s;
+
+            &:hover {
+                color: var(--text-sec);
+            }
+        }
+    }
+}
+
+@mixin copyright-base {
+    display: flex;
+    align-items: center;
+    width: 70%;
+    padding-top: 25px;
+    border-top: 1px solid var(--border);
+    gap: 28px;
+
+    &__year {
+        font-family: var(--font-body);
+        font-size: 11px;
+        color: var(--text-dim);
+        cursor: default;
+        margin-right: auto;
+    }
+
+    &__link {
+        font-family: var(--font-body);
+        font-size: 11px;
+        color: var(--text-dim);
+        cursor: pointer;
+        transition: color 0.15s;
+
+        &:hover {
+            color: var(--text-sec);
+            text-decoration: underline;
+        }
+    }
+}
+
+// ── Full footer ────────────────────────────────────────────────
+.footer {
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-top: 1px solid var(--border);
+
+    // <div className="footer__watermark"> → <img>
+    &__watermark {
+        width: 70%;
+        padding: 72px 0 64px;
+        display: flex;
+        justify-content: center;
+
+        img {
+            width: 50%;
+            opacity: 0.3;
+            user-select: none;
+            filter: grayscale(1);
+            pointer-events: none;
+        }
+    }
+
+    // <div className="footer__divider" />
+    &__divider {
+        width: 70%;
+        height: 1px;
+        background: var(--border);
+        flex-shrink: 0;
+    }
+
+    // <div className="footer__newsletter"> → <img> + <div className="footer__newsletter-form">
+    &__newsletter {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 70%;
+        padding: 52px 0;
+
+        // <img className="footer__newsletter-logo">
+        &-logo {
+            height: 26px;
+            opacity: 0.4;
+            user-select: none;
+            filter: grayscale(0.2);
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.65;
+            }
+        }
+
+        // <div className="footer__newsletter-form"> → <input> + <button>
+        &-form {
+            display: flex;
+            height: 42px;
+            width: 38%;
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+
+            &:focus-within {
+                border-color: var(--border-hov);
+            }
+
+            // <input className="footer__newsletter-input">
+            // nested inside &-form but targeting class
+        }
+
+        &-input {
+            border: none;
+            background: var(--surface);
+            color: var(--text-pri);
+            width: 100%;
+            padding: 0 16px;
+            outline: none;
+            font-family: var(--font-body);
+            font-size: 13px;
+            letter-spacing: 0.3px;
+            transition: background 0.15s;
+
+            &::placeholder {
+                color: var(--text-dim);
+            }
+
+            &:focus {
+                background: var(--surface-hov);
+            }
+        }
+
+        // <button className="footer__newsletter-btn">
+        &-btn {
+            border: none;
+            border-left: 1px solid var(--border);
+            font-family: var(--font-body);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--text-dim);
+            background: var(--surface);
+            cursor: pointer;
+            padding: 0 20px;
+            white-space: nowrap;
+            transition: background 0.15s, color 0.15s;
+
+            &:hover {
+                background: var(--surface-hov);
+                color: var(--text-sec);
+            }
+        }
+    }
+
+    // <div className="quick-links"> (shared component)
+    .quick-links {
+        @include quick-links-base;
+    }
+
+    // <div className="copyright"> (shared component)
+    .copyright {
+        @include copyright-base;
+        margin-bottom: 40px;
+    }
+}
+
+// ── Minimal footer ─────────────────────────────────────────────
+.footer-minimal {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+
+    // <div className="footer-minimal__inner"> → <QuickLinks /> + <Copyright />
+    &__inner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+
+        // <div className="quick-links"> (shared component)
+        .quick-links {
+            @include quick-links-base;
+            padding: 48px 0 40px;
+
+            // tighter in minimal context
+            &__col {
+                gap: 8px;
+            }
+
+            &__heading {
+                margin-bottom: 6px;
+            }
+        }
+
+        // <div className="copyright"> (shared component)
+        .copyright {
+            @include copyright-base;
+            margin-bottom: 32px;
+        }
+    }
+}
