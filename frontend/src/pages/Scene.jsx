@@ -34,8 +34,7 @@ const getPrimaryTag = tags => {
 function PlaySVG({ size = 80 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 80 80" fill="none">
-      <circle cx="40" cy="40" r="38" stroke="rgba(255,255,255,0.22)" strokeWidth="1.5" />
-      <circle cx="40" cy="40" r="38" stroke="rgba(255,255,255,0.06)" strokeWidth="14" />
+      <circle cx="40" cy="40" r="38" stroke="rgba(255,255,255,0.22)" strokeWidth="2" />
       <polygon points="33,23 61,40 33,57" fill="white" opacity="0.92" />
     </svg>
   );
