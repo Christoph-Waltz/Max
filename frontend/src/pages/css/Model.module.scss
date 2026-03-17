@@ -92,7 +92,7 @@
       display: block;
       object-fit: cover;
       object-position: top;
-      mask-image: linear-gradient(to bottom, black 30%, rgba(0, 0, 0, 0.4) 60%, transparent 100%);
+      mask-image: linear-gradient(to bottom, black 50%, rgba(0, 0, 0, 0.4) 75%, transparent 100%);
     }
 
     &-fade {
