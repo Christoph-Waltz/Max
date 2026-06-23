@@ -15,11 +15,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const STORAGE = path.join(__dirname, "..", "storage");
 const execAsync = promisify(exec);
 
-function formatPaths(scene) {
+function formatPaths(scene, req) {
     const obj = typeof scene.toObject === "function" ? scene.toObject() : { ...scene };
-    obj.cover = `http://localhost:5000/api${obj.cover}`;
-    obj.video = `http://localhost:5000/api${obj.video}`;
-    if (obj.sneak) obj.sneak = `http://localhost:5000/api${obj.sneak}`;
+    const base = `${req.protocol}://${req.get("host")}/api`;
+    obj.cover = `${base}${obj.cover}`;
+    obj.video = `${base}${obj.video}`;
+    if (obj.sneak) obj.sneak = `${base}${obj.sneak}`;
     return obj;
 }
 
@@ -73,7 +74,7 @@ router.get("/", async (req, res) => {
         if (sceneId) {
             const scene = await Scene.findOne({ sceneId });
             if (!scene) return res.status(404).json({ msg: "Scene not found" });
-            return res.status(200).json(formatPaths(scene));
+            return res.status(200).json(formatPaths(scene, req));
         }
 
         const query = {};
@@ -86,7 +87,7 @@ router.get("/", async (req, res) => {
         if (cover) {
             const scene = await mq.limit(1).lean();
             if (!scene.length) return res.status(404).json({ msg: "No scenes found" });
-            return res.status(200).json(formatPaths(scene[0]));
+            return res.status(200).json(formatPaths(scene[0], req));
         }
 
         if (count && !limit) {
@@ -96,11 +97,11 @@ router.get("/", async (req, res) => {
         if (limit) mq = mq.limit(Number(limit));
         const scenes = await mq.lean();
 
-	if (count) {
-    	    return res.status(200).json({ count: await Scene.countDocuments(query), data: scenes.map(s => formatPaths(s, req)) });
-	}
+        if (count) {
+            return res.status(200).json({ count: await Scene.countDocuments(query), data: scenes.map(s => formatPaths(s, req)) });
+        }
 
-        return res.status(200).json(scenes.map(formatPaths));
+        return res.status(200).json(scenes.map(s => formatPaths(s, req)));
     } catch (err) {
         res.status(500).json({ msg: err.message });
     }
@@ -147,7 +148,7 @@ router.post("/", (req, res, next) => {
 
             const scene = await Scene.findOne({ sceneId });
             if (!scene) return res.status(404).json({ msg: "Scene not found in database" });
-            return res.status(200).json(formatPaths(scene));
+            return res.status(200).json(formatPaths(scene, req));
         } catch (err) {
             return res.status(500).json({ msg: err.message });
         }
@@ -212,7 +213,7 @@ router.post("/", (req, res, next) => {
         }
 
         await session.commitTransaction();
-        res.status(201).json(formatPaths(scene[0]));
+        res.status(201).json(formatPaths(scene[0], req));
     } catch (err) {
         await session.abortTransaction();
         cleanup();
@@ -306,7 +307,7 @@ router.patch("/", (req, res, next) => {
 
         if (!Object.keys(updates).length) {
             await session.abortTransaction();
-            return res.status(200).json(formatPaths(scene));
+            return res.status(200).json(formatPaths(scene, req));
         }
 
         const updated = await Scene.findOneAndUpdate(
@@ -316,7 +317,7 @@ router.patch("/", (req, res, next) => {
         );
 
         await session.commitTransaction();
-        res.status(200).json(formatPaths(updated));
+        res.status(200).json(formatPaths(updated, req));
     } catch (err) {
         await session.abortTransaction();
         res.status(500).json({ msg: err.message });
