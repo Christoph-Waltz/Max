@@ -96,9 +96,9 @@ router.get("/", async (req, res) => {
         if (limit) mq = mq.limit(Number(limit));
         const scenes = await mq.lean();
 
-        if (count) {
-            return res.status(200).json({ count: await Scene.countDocuments(query), data: scenes.map(formatPaths) });
-        }
+	if (count) {
+    	    return res.status(200).json({ count: await Scene.countDocuments(query), data: scenes.map(s => formatPaths(s, req)) });
+	}
 
         return res.status(200).json(scenes.map(formatPaths));
     } catch (err) {

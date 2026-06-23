@@ -16,10 +16,11 @@ const enumFields = {
 };
 
 
-function formatPaths(model) {
-    model.portrait = `http://localhost:5000/api${model.portrait}`;
-    model.closeup = `http://localhost:5000/api${model.closeup}`;
-    model.landscape = `http://localhost:5000/api${model.landscape}`;
+function formatPaths(model, req) {
+    const base = `${req.protocol}://${req.get("host")}/api`;
+    model.portrait  = `${base}${model.portrait}`;
+    model.closeup   = `${base}${model.closeup}`;
+    model.landscape = `${base}${model.landscape}`;
     return model;
 }
 
@@ -197,7 +198,7 @@ router.get("/", async (req, res) => {
         if (name) {
             const model = await Model.findOne({ name });
             if (!model) return res.status(404).json({ msg: "Model could not found" });
-            return res.status(200).json(formatPaths(model));
+            return res.status(200).json(formatPaths(model, req));
         }
         else if (names) {
             const nameArray = decodeURIComponent(names).split(/\+|,/).map(n => n.trim());
@@ -225,12 +226,12 @@ router.get("/", async (req, res) => {
             const totalCount = await Model.countDocuments(query);
             return res.status(200).json({
                 count: totalCount,
-                data: formatPaths(models)
+                data: models.map(m => formatPaths(m, req))
             });
         }
 
         if (!models.length) return res.status(404).json({ msg: "No models found" });
-        res.status(200).json(models.map(formatPaths));
+        res.status(200).json(models.map(m => formatPaths(m, req)));
     } catch (err) {
         res.status(500).json({ msg: err.message });
     }
