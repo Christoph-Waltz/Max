@@ -91,7 +91,7 @@ router.post("/", imageUpload, async (req, res) => {
         const flags = Object.fromEntries(
             Object.entries(req.body)
                 .filter(([key]) => allowedFlags.includes(key))
-                .map(([key, value]) => [key, Boolean(value)])
+                .map(([key, value]) => [key, value === "true" || value === true])
         );
 
         const model = await Model.create({
