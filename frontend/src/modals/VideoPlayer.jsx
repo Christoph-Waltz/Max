@@ -46,7 +46,6 @@ function Base({ children, onClose }) {
     const [visible, setVisible] = useState(false);
     const contentRef = useRef(null);
 
-    // Trigger enter animation on next frame
     useEffect(() => {
         requestAnimationFrame(() => setVisible(true));
     }, []);
@@ -56,7 +55,6 @@ function Base({ children, onClose }) {
         setTimeout(onClose, 220);
     }, [onClose]);
 
-    // Overlay click — close if clicking the backdrop, not the window
     const handleOverlay = (e) => {
         if (contentRef.current && !contentRef.current.contains(e.target)) {
             handleClose();
@@ -98,14 +96,14 @@ function Player({ scene, onClose, fsRef }) {
     const isDragging = useRef(false);
 
     const [paused, setPaused] = useState(false);
-    const [muted, setMuted] = useState(true);
-    const [volume, setVolume] = useState(0.7);
+    const [muted, setMuted] = useState(false);   // ← unmuted by default
+    const [volume, setVolume] = useState(1.0);
     const [current, setCurrent] = useState(0);
     const [duration, setDuration] = useState(0);
     const [isFs, setIsFs] = useState(false);
     const [ctrlsVis, setCtrlsVis] = useState(true);
 
-    // ── Auto-hide controls ──
+    // ── Auto-hide controls (and cursor) ──
     const showCtrls = useCallback(() => {
         setCtrlsVis(true);
         clearTimeout(hideTimer.current);
@@ -122,7 +120,7 @@ function Player({ scene, onClose, fsRef }) {
         const v = videoRef.current;
         if (!v) return;
         v.volume = volume;
-        v.muted = muted;
+        v.muted = false;   // ← unmuted on init
         v.play().catch(() => { });
 
         const onTime = () => { if (!isDragging.current) setCurrent(v.currentTime); };
@@ -182,10 +180,7 @@ function Player({ scene, onClose, fsRef }) {
         setMuted(val === 0);
     }, []);
 
-    // ── Seek — fixes the "stuck to pointer" bug ──
-    // We compute position from the bar rect, set currentTime directly,
-    // and use a ref for isDragging so the mousemove handler never has a
-    // stale closure. Both listeners are removed in the SAME mouseup handler.
+    // ── Seek ──
     const seekToX = useCallback(clientX => {
         const v = videoRef.current;
         const bar = progressRef.current;
@@ -197,7 +192,7 @@ function Player({ scene, onClose, fsRef }) {
     }, []);
 
     const onProgressMouseDown = useCallback(e => {
-        e.preventDefault();                 // prevent text-selection during drag
+        e.preventDefault();
         isDragging.current = true;
         seekToX(e.clientX);
 
@@ -207,11 +202,10 @@ function Player({ scene, onClose, fsRef }) {
         };
 
         const onUp = (e) => {
-            // Remove BOTH listeners here — this is the fix
             window.removeEventListener("mousemove", onMove);
             window.removeEventListener("mouseup", onUp);
             isDragging.current = false;
-            seekToX(e.clientX);             // snap to final position
+            seekToX(e.clientX);
         };
 
         window.addEventListener("mousemove", onMove);
@@ -229,11 +223,11 @@ function Player({ scene, onClose, fsRef }) {
                     e.preventDefault(); togglePlay(); break;
                 case "ArrowRight":
                     e.preventDefault();
-                    if (v) { v.currentTime = Math.min(v.duration, v.currentTime + 10); }
+                    if (v) { v.currentTime = Math.min(v.duration, v.currentTime + 30); }
                     break;
                 case "ArrowLeft":
                     e.preventDefault();
-                    if (v) { v.currentTime = Math.max(0, v.currentTime - 10); }
+                    if (v) { v.currentTime = Math.max(0, v.currentTime - 30); }
                     break;
                 case "ArrowUp":
                     e.preventDefault();
@@ -277,10 +271,10 @@ function Player({ scene, onClose, fsRef }) {
         background: `linear-gradient(to right, #9dc9a0 ${volPct}%, rgba(255,255,255,0.18) ${volPct}%)`,
     };
 
-    console.log(scene);
     return (
         <div
             className={styles.player}
+            style={{ cursor: ctrlsVis ? "default" : "none" }}  // ← hide cursor with controls
             onMouseMove={showCtrls}
         >
             {/* ── Video area — click to play/pause ── */}
